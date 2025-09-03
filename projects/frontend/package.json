@@ -12,28 +12,39 @@
     "npm": ">=9.0"
   },
   "devDependencies": {
+    "@algorandfoundation/algokit-client-generator": "^6.0.0",
+    "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^18.17.14",
     "@types/react": "^18.2.11",
     "@types/react-dom": "^18.2.4",
     "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.14",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "vite": "^5.0.0",
-    "vite-plugin-node-polyfills": "^0.22.0",
-    "@algorandfoundation/algokit-client-generator": "^6.0.0"
+    "vite-plugin-node-polyfills": "^0.22.0"
   },
   "dependencies": {
-    "notistack": "^3.0.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tslib": "^2.6.2",
     "@algorandfoundation/algokit-utils": "^9.0.0",
     "@blockshake/defly-connect": "^1.2.1",
     "@perawallet/connect": "^1.4.1",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "@txnlab/use-wallet": "^4.0.0",
     "@txnlab/use-wallet-react": "^4.0.0",
-    "algosdk": "^3.0.0"
+    "algosdk": "^3.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.542.0",
+    "notistack": "^3.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "tslib": "^2.6.2"
   },
   "scripts": {
     "dev": "npm run generate:app-clients && vite",

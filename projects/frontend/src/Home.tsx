@@ -3,12 +3,14 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import React, { useState } from 'react'
 import ConnectWallet from './components/ConnectWallet'
 import Transact from './components/Transact'
+import UploadContent from './components/UploadContent'
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
   const [openDemoModal, setOpenDemoModal] = useState<boolean>(false)
+  const [openUploadModal, setOpenUploadModal] = useState<boolean>(false)
   const { activeAddress } = useWallet()
 
   const toggleWalletModal = () => {
@@ -17,6 +19,10 @@ const Home: React.FC<HomeProps> = () => {
 
   const toggleDemoModal = () => {
     setOpenDemoModal(!openDemoModal)
+  }
+
+  const toggleUploadModal = () => {
+    setOpenUploadModal(!openUploadModal)
   }
 
   return (
@@ -45,6 +51,10 @@ const Home: React.FC<HomeProps> = () => {
               Wallet Connection
             </button>
 
+            <button data-test-id="upload-content" className="btn btn-secondary m-2" onClick={toggleUploadModal}>
+              Upload Content
+            </button>
+
             {activeAddress && (
               <button data-test-id="transactions-demo" className="btn m-2" onClick={toggleDemoModal}>
                 Transactions Demo
@@ -54,6 +64,7 @@ const Home: React.FC<HomeProps> = () => {
 
           <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
           <Transact openModal={openDemoModal} setModalState={setOpenDemoModal} />
+          <UploadContent openModal={openUploadModal} setModalState={setOpenUploadModal} />
         </div>
       </div>
     </div>

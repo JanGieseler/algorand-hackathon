@@ -5,6 +5,7 @@ from .models import AssetUploadRequest, Asset, AssetSummary
 from .storage import storage
 
 def generate_asset_id(asset: AssetUploadRequest) -> str:
+    """The Asset ID hashes the content and meta data of the asset and thereby gives it a unique representation"""
     data_to_hash = {
         "content": asset.content,
         "location": {"latitude": asset.location.latitude, "longitude": asset.location.longitude},

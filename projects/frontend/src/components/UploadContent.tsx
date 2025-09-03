@@ -1,220 +1,196 @@
-import { useSnackbar } from 'notistack'
-import { useState } from 'react'
+import { useSnackbar } from "notistack";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 
 interface UploadContentInterface {
-  openModal: boolean
-  setModalState: (value: boolean) => void
+  openModal: boolean;
+  setModalState: (value: boolean) => void;
 }
 
 interface UploadFormData {
-  content: string
-  publisher: string
-  creator: string
-  description: string
-  timestamp: string
+  content: string;
+  publisher: string;
+  creator: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  timestamp: string;
 }
 
 const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => {
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<UploadFormData>({
-    content: '',
-    publisher: '',
-    creator: '',
-    description: '',
-    timestamp: ''
-  })
+    content: "",
+    publisher: "",
+    creator: "",
+    description: "",
+    latitude: 0,
+    longitude: 0,
+    timestamp: "",
+  });
 
-  const { enqueueSnackbar } = useSnackbar()
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleInputChange = (field: keyof UploadFormData, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-  }
+      [field]: value,
+    }));
+  };
 
-  const handleSubmit = async () => {
-    setLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
     // Validate required fields
     if (!formData.content.trim() || !formData.publisher.trim() || !formData.creator.trim() || !formData.description.trim()) {
-      enqueueSnackbar('Please fill in all fields', { variant: 'warning' })
-      setLoading(false)
-      return
+      enqueueSnackbar("Please fill in all fields", { variant: "warning" });
+      setLoading(false);
+      return;
     }
 
     try {
-      enqueueSnackbar('Uploading content...', { variant: 'info' })
-      
-      formData.timestamp = new Date(Date.now()).toISOString();
-      const response = await fetch('/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      enqueueSnackbar("Uploading content...", { variant: "info" });
+      const { latitude, longitude, ...rest } = formData;
+      const dataToSubmit = {
+        ...rest,
+        timestamp: new Date(Date.now()).toISOString(),
+        location: {
+          latitude: formData.latitude,
+          longitude: formData.longitude,
         },
-        body: JSON.stringify(formData),
-      })
+      };
+
+      const response = await fetch("/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSubmit),
+      });
 
       if (response.ok) {
-        enqueueSnackbar('Content uploaded successfully!', { variant: 'success' })
+        enqueueSnackbar("Content uploaded successfully!", { variant: "success" });
         // Reset form
         setFormData({
-          content: '',
-          publisher: '',
-          creator: '',
-          description: '',
-          timestamp: ''
-        })
-        setModalState(false)
+          content: "",
+          publisher: "",
+          creator: "",
+          description: "",
+          latitude: 0,
+          longitude: 0,
+          timestamp: "",
+        });
+        setModalState(false);
       } else {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (e) {
-      console.error('Upload failed:', e)
-      enqueueSnackbar('Failed to upload content', { variant: 'error' })
+      console.error("Upload failed:", e);
+      enqueueSnackbar("Failed to upload content", { variant: "error" });
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const isFormValid = formData.content.trim() && formData.publisher.trim() && formData.creator.trim() && formData.description.trim()
+  const isFormValid = formData.content.trim() && formData.publisher.trim() && formData.creator.trim() && formData.description.trim();
 
   return (
-    <dialog id="upload_modal" className={`modal ${openModal ? 'modal-open' : ''}`} style={{ display: openModal ? 'block' : 'none' }}>
-      <div className="modal-backdrop bg-black bg-opacity-50" onClick={() => setModalState(false)} />
-      <div className="modal-box max-w-3xl bg-white shadow-2xl border-0">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-          <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            📄 Upload Content
-          </h3>
-          <button 
-            className="btn btn-sm btn-circle btn-ghost text-gray-500 hover:text-gray-700"
-            onClick={() => setModalState(false)}
-          >
-            ✕
-          </button>
-        </div>
-        
-        <div className="space-y-8 px-2">
-          {/* Content Text Area */}
-          <div className="form-control">
-            <label className="label pb-3">
-              <span className="label-text text-base font-semibold text-gray-700 flex items-center gap-2">
-                📝 Content
-              </span>
-              <span className="label-text-alt text-gray-500">Required</span>
-            </label>
-            <textarea
-              data-test-id="content-input"
-              placeholder="Paste your plain text content here..."
-              className="w-full h-40 resize-none p-4 text-sm leading-relaxed border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-100 focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 bg-gray-50 focus:bg-white"
-              value={formData.content}
-              onChange={(e) => handleInputChange('content', e.target.value)}
-            />
-            <label className="label pt-2">
-              <span className="label-text-alt text-gray-500">{formData.content.length} characters</span>
-            </label>
-          </div>
+    <Dialog open={openModal} onOpenChange={setModalState}>
+      <DialogContent className="sm:max-w-[425px] bg-slate-200">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Upload Content</DialogTitle>
+            <DialogDescription>Fill out the form below to upload your content</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="content-1">Content</Label>
+              <Textarea
+                id="content-1"
+                name="content"
+                placeholder="Enter your content here..."
+                required
+                className="min-h-[100px]"
+                value={formData.content}
+                onChange={(e) => handleInputChange("content", e.target.value)}
+              />
+            </div>
 
-          {/* Two Column Layout for Publisher and Creator */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Publisher Input */}
-            <div className="form-control">
-              <label className="label pb-3">
-                <span className="label-text text-base font-semibold text-gray-700 flex items-center gap-2">
-                  🏢 Publisher
-                </span>
-                <span className="label-text-alt text-gray-500">Required</span>
-              </label>
-              <input
-                type="text"
-                data-test-id="publisher-input"
-                placeholder="Enter publisher name"
-                className="w-full p-4 text-sm border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-100 focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 bg-gray-50 focus:bg-white"
+            <div className="grid gap-2">
+              <Label htmlFor="description-1">Description</Label>
+              <Input
+                id="description-1"
+                name="description"
+                placeholder="Brief description"
+                required
+                value={formData.description}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="publisher-1">Publisher</Label>
+              <Input
+                id="publisher-1"
+                name="publisher"
+                placeholder="Publisher name"
+                required
                 value={formData.publisher}
-                onChange={(e) => handleInputChange('publisher', e.target.value)}
+                onChange={(e) => handleInputChange("publisher", e.target.value)}
               />
             </div>
 
-            {/* Creator Input */}
-            <div className="form-control">
-              <label className="label pb-3">
-                <span className="label-text text-base font-semibold text-gray-700 flex items-center gap-2">
-                  👤 Creator
-                </span>
-                <span className="label-text-alt text-gray-500">Required</span>
-              </label>
-              <input
-                type="text"
-                data-test-id="creator-input"
-                placeholder="Enter creator name"
-                className="w-full p-4 text-sm border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-100 focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 bg-gray-50 focus:bg-white"
+            <div className="grid gap-2">
+              <Label htmlFor="creator-1">Creator</Label>
+              <Input
+                id="creator-1"
+                name="creator"
+                placeholder="Creator name"
+                required
                 value={formData.creator}
-                onChange={(e) => handleInputChange('creator', e.target.value)}
+                onChange={(e) => handleInputChange("creator", e.target.value)}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="creator-1">Location</Label>
+              <Input
+                id="location-1"
+                name="location"
+                placeholder="Latitude"
+                required
+                value={formData.latitude}
+                onChange={(e) => handleInputChange("latitude", e.target.value)}
+              />
+              <Input
+                id="location-2"
+                name="location2"
+                placeholder="Longitude"
+                required
+                value={formData.longitude}
+                onChange={(e) => handleInputChange("longitude", e.target.value)}
               />
             </div>
           </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" type="button">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={loading || !isFormValid}>
+              {loading ? "Uploading..." : "Submit"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-          {/* Description Input */}
-          <div className="form-control">
-            <label className="label pb-3">
-              <span className="label-text text-base font-semibold text-gray-700 flex items-center gap-2">
-                📋 Description
-              </span>
-              <span className="label-text-alt text-gray-500">Required</span>
-            </label>
-                          <input
-              type="text"
-              data-test-id="description-input"
-              placeholder="Enter content description"
-              className="w-full p-4 text-sm border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-100 focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md hover:border-gray-300 bg-gray-50 focus:bg-white"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="modal-action mt-10 pt-8 border-t border-gray-200">
-          <div className="flex gap-4 w-full px-2">
-            <button 
-              type="button"
-              className="flex-1 py-3 px-6 rounded-xl font-semibold text-gray-700 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95" 
-              onClick={() => setModalState(false)}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              data-test-id="submit-upload"
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold text-white transition-all duration-300 ${
-                !isFormValid || loading 
-                  ? 'bg-gray-300 cursor-not-allowed' 
-                  : 'bg-teal-600 hover:bg-teal-700 hover:shadow-lg active:scale-95 shadow-md'
-              }`}
-              onClick={handleSubmit}
-              disabled={!isFormValid || loading}
-            >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  Uploading...
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  🚀 Upload Content
-                </div>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </dialog>
-  )
-}
-
-export default UploadContent
-
-
-
+export default UploadContent;

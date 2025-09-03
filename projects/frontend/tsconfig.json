@@ -20,16 +20,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "vite.config.js",
-    "src/utils/",
-    "src/utils/",
-    "src/main.tsx",
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.js", "src/utils/", "src/utils/", "src/main.tsx"],
   "references": [
     {
       "path": "./tsconfig.node.json"

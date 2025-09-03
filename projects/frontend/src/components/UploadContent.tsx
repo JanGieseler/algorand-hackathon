@@ -65,7 +65,7 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
         },
       };
 
-      const response = await fetch("/upload", {
+      const response = await fetch("http://localhost:8000/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

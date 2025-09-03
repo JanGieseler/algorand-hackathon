@@ -1,0 +1,65 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main, backend ]
+    paths:
+      - 'projects/api/**'
+  pull_request:
+    branches: [ main, backend ]
+    paths:
+      - 'projects/api/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./projects/api
+    
+    strategy:
+      matrix:
+        python-version: [3.10.x, 3.11.x, 3.12.x]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: true
+    
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: projects/api/.venv
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+    
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+    
+    - name: Install project
+      run: poetry install --no-interaction
+    
+    - name: Run tests
+      run: poetry run pytest tests/ -v --tb=short
+    
+    - name: Run linting (if available)
+      run: |
+        if poetry run which ruff > /dev/null 2>&1; then
+          poetry run ruff check .
+        else
+          echo "Ruff not installed, skipping linting"
+        fi
+      continue-on-error: true

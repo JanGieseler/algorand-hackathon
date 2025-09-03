@@ -41,6 +41,20 @@ class AssetsListResponse(BaseModel):
     assets: List[AssetSummary]
     message: str
 
+class Asset(BaseModel):
+    asset_id: str
+    description: str
+    content: str
+    location: GPSCoordinates
+    timestamp: datetime
+    creator: str
+    publisher: str
+
+class AssetResponse(BaseModel):
+    success: bool
+    asset: Optional[Asset] = None
+    message: str
+
 def generate_asset_id(asset: AssetUploadRequest) -> str:
     data_to_hash = {
         "content": asset.content,
@@ -87,4 +101,21 @@ async def list_assets():
         success=True,
         assets=dummy_assets,
         message="Assets retrieved successfully"
+    )
+
+@app.get("/assets/{asset_id}", response_model=AssetResponse)
+async def get_asset(asset_id: str):
+    dummy_asset = Asset(
+        asset_id=asset_id,
+        description="Sample asset description",
+        content="This is the sample content of the asset",
+        location=GPSCoordinates(latitude=40.7128, longitude=-74.0060),
+        timestamp=datetime.fromisoformat("2024-01-01T12:00:00"),
+        creator="creator123",
+        publisher="publisher456"
+    )
+    return AssetResponse(
+        success=True,
+        asset=dummy_asset,
+        message="Asset retrieved successfully"
     )

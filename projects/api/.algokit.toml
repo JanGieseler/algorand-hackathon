@@ -1,0 +1,11 @@
+[algokit]
+min_version = "v2.0.0"
+
+[project]
+type = "backend"
+name = "api-server"
+
+[project.run]
+dev = { commands = ["poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000"], description = "Start development server" }
+start = { commands = ["poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000"], description = "Start production server" }
+build = { commands = ["poetry install"], description = "Install dependencies" }

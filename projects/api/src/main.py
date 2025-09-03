@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 import hashlib
 import json
@@ -30,6 +30,15 @@ class AssetUploadRequest(BaseModel):
 class AssetUploadResponse(BaseModel):
     success: bool
     asset_id: Optional[str] = None
+    message: str
+
+class AssetSummary(BaseModel):
+    asset_id: str
+    description: str
+
+class AssetsListResponse(BaseModel):
+    success: bool
+    assets: List[AssetSummary]
     message: str
 
 def generate_asset_id(asset: AssetUploadRequest) -> str:
@@ -65,4 +74,17 @@ async def upload_asset(asset: AssetUploadRequest):
         success=True,
         asset_id=asset_id,
         message="Asset uploaded successfully"
+    )
+
+@app.get("/assets", response_model=AssetsListResponse)
+async def list_assets():
+    dummy_assets = [
+        AssetSummary(asset_id="a7e59cf752cd9cf52a016d79f56ef4986132c889b198a97e4e63f5346ad1ed11", description="Sample asset 1"),
+        AssetSummary(asset_id="08d1eed0344be85ec7cb37e7e244327b424d92e09a6c4a4facc4d98fb227c27b", description="Sample asset 2"),
+        AssetSummary(asset_id="91b1f3f26882f6db4c2e427c3dbf7f76e7fb493b7c4866812395ef00a6834515", description="Sample asset 3")
+    ]
+    return AssetsListResponse(
+        success=True,
+        assets=dummy_assets,
+        message="Assets retrieved successfully"
     )

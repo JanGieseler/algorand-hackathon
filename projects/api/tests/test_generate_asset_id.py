@@ -35,9 +35,9 @@ class TestGenerateAssetId:
         asset_id = generate_asset_id(asset)
         
         # SHA-256 hex string should be 64 characters long
-        assert len(asset_id) == 64
+        assert len(asset_id.value) == 64
         # Should only contain hexadecimal characters
-        assert all(c in "0123456789abcdef" for c in asset_id)
+        assert all(c in "0123456789abcdef" for c in asset_id.value)
     
     def test_generate_asset_id_different_content(self):
         """Test that different content generates different asset IDs"""
@@ -179,4 +179,4 @@ class TestGenerateAssetId:
         
         # This is the expected hash for the specific input above
         expected_id = "e872179dc951d84997944d378116e9d0906dcb127aa6a00c1d122dd180a003ad"
-        assert asset_id == expected_id
+        assert asset_id.value == expected_id

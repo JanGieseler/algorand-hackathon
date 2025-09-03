@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 from src.storage import InMemoryAssetStorage
-from src.models import AssetUploadRequest, GPSCoordinates
+from src.models import AssetUploadRequest, GPSCoordinates, AssetId
 
 class TestInMemoryAssetStorage:
     
@@ -41,18 +41,20 @@ class TestInMemoryAssetStorage:
         assert len(initial_assets) == 0
         
         # Add first asset
-        asset_id_1 = self.storage.save(asset1, "test_id_1")
-        assert asset_id_1 == "test_id_1"
+        test_id_1 = AssetId.from_string("a" * 64)  # Valid SHA-256 format
+        asset_id_1 = self.storage.save(asset1, test_id_1)
+        assert asset_id_1 == test_id_1
         
         # Check we have one asset
         assets_after_first = self.storage.list()
         assert len(assets_after_first) == 1
-        assert assets_after_first[0].asset_id == "test_id_1"
+        assert assets_after_first[0].asset_id == test_id_1
         assert assets_after_first[0].description == "First test asset"
         
         # Add second asset
-        asset_id_2 = self.storage.save(asset2, "test_id_2")
-        assert asset_id_2 == "test_id_2"
+        test_id_2 = AssetId.from_string("b" * 64)  # Valid SHA-256 format
+        asset_id_2 = self.storage.save(asset2, test_id_2)
+        assert asset_id_2 == test_id_2
         
         # Check we have two assets
         all_assets = self.storage.list()
@@ -60,8 +62,8 @@ class TestInMemoryAssetStorage:
         
         # Verify both assets are in the list
         asset_ids = [asset.asset_id for asset in all_assets]
-        assert "test_id_1" in asset_ids
-        assert "test_id_2" in asset_ids
+        assert test_id_1 in asset_ids
+        assert test_id_2 in asset_ids
         
         descriptions = [asset.description for asset in all_assets]
         assert "First test asset" in descriptions
@@ -79,14 +81,15 @@ class TestInMemoryAssetStorage:
         )
         
         # Save asset
-        asset_id = self.storage.save(asset, "retrieve_test_id")
+        test_id = AssetId.from_string("c" * 64)  # Valid SHA-256 format
+        asset_id = self.storage.save(asset, test_id)
         
         # Retrieve asset
-        retrieved_asset = self.storage.retrieve("retrieve_test_id")
+        retrieved_asset = self.storage.retrieve(test_id)
         
         # Verify retrieved asset matches original
         assert retrieved_asset is not None
-        assert retrieved_asset.asset_id == "retrieve_test_id"
+        assert retrieved_asset.asset_id == test_id
         assert retrieved_asset.description == "Retrievable asset"
         assert retrieved_asset.content == "Content for retrieval test"
         assert retrieved_asset.creator == "test_creator"
@@ -96,5 +99,6 @@ class TestInMemoryAssetStorage:
     
     def test_retrieve_nonexistent_asset_returns_none(self):
         """Test that retrieving a non-existent asset returns None"""
-        result = self.storage.retrieve("nonexistent_id")
+        nonexistent_id = AssetId.from_string("d" * 64)  # Valid SHA-256 format
+        result = self.storage.retrieve(nonexistent_id)
         assert result is None

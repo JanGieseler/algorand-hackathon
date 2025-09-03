@@ -5,7 +5,8 @@ from .models import (
     AssetUploadRequest, 
     AssetUploadResponse, 
     AssetsListResponse, 
-    AssetResponse
+    AssetResponse,
+    AssetId
 )
 from .utils import save_asset, get_asset_by_id, get_all_assets
 
@@ -45,7 +46,15 @@ async def list_assets():
 
 @router.get("/assets/{asset_id}", response_model=AssetResponse)
 async def get_asset(asset_id: str):
-    asset = get_asset_by_id(asset_id)
+    try:
+        asset_id_obj = AssetId.from_string(asset_id)
+        asset = get_asset_by_id(asset_id_obj)
+    except ValueError:
+        return AssetResponse(
+            success=False,
+            asset=None,
+            message="Invalid asset ID format"
+        )
     if asset is None:
         return AssetResponse(
             success=False,

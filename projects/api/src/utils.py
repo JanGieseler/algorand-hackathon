@@ -1,10 +1,10 @@
 import hashlib
 import json
 from typing import List, Optional
-from .models import AssetUploadRequest, Asset, AssetSummary
+from .models import AssetUploadRequest, Asset, AssetSummary, AssetId
 from .storage import storage
 
-def generate_asset_id(asset: AssetUploadRequest) -> str:
+def generate_asset_id(asset: AssetUploadRequest) -> AssetId:
     """The Asset ID hashes the content and meta data of the asset and thereby gives it a unique representation"""
     data_to_hash = {
         "content": asset.content,
@@ -15,14 +15,15 @@ def generate_asset_id(asset: AssetUploadRequest) -> str:
     }
     
     hash_string = json.dumps(data_to_hash, sort_keys=True)
-    return hashlib.sha256(hash_string.encode()).hexdigest()
+    hash_value = hashlib.sha256(hash_string.encode()).hexdigest()
+    return AssetId.from_string(hash_value)
 
-def save_asset(asset_request: AssetUploadRequest) -> str:
+def save_asset(asset_request: AssetUploadRequest) -> AssetId:
     """Save an asset and return its generated ID"""
     asset_id = generate_asset_id(asset_request)
     return storage.save(asset_request, asset_id)
 
-def get_asset_by_id(asset_id: str) -> Optional[Asset]:
+def get_asset_by_id(asset_id: AssetId) -> Optional[Asset]:
     """Retrieve an asset by its ID"""
     return storage.retrieve(asset_id)
 

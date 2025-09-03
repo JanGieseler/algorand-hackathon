@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
-from .models import Asset, AssetUploadRequest, AssetSummary
+from .models import Asset, AssetUploadRequest, AssetSummary, AssetId
 
 class AssetStorage(ABC):
     """Abstract base class for asset storage implementations"""
     
     @abstractmethod
-    def save(self, asset_request: AssetUploadRequest, asset_id: str) -> str:
+    def save(self, asset_request: AssetUploadRequest, asset_id: AssetId) -> AssetId:
         """
         Save an asset and return its ID
         
@@ -30,7 +30,7 @@ class AssetStorage(ABC):
         pass
     
     @abstractmethod
-    def retrieve(self, asset_id: str) -> Optional[Asset]:
+    def retrieve(self, asset_id: AssetId) -> Optional[Asset]:
         """
         Retrieve a specific asset by its ID
         
@@ -46,9 +46,9 @@ class InMemoryAssetStorage(AssetStorage):
     """In-memory implementation of asset storage"""
     
     def __init__(self):
-        self._storage: Dict[str, Asset] = {}
+        self._storage: Dict[AssetId, Asset] = {}
     
-    def save(self, asset_request: AssetUploadRequest, asset_id: str) -> str:
+    def save(self, asset_request: AssetUploadRequest, asset_id: AssetId) -> AssetId:
         """Save an asset in memory"""
         asset = Asset(
             asset_id=asset_id,
@@ -70,7 +70,7 @@ class InMemoryAssetStorage(AssetStorage):
             for asset in self._storage.values()
         ]
     
-    def retrieve(self, asset_id: str) -> Optional[Asset]:
+    def retrieve(self, asset_id: AssetId) -> Optional[Asset]:
         """Retrieve a specific asset by its ID"""
         return self._storage.get(asset_id)
 
@@ -83,11 +83,11 @@ class FileSystemAssetStorage(AssetStorage):
         # Create storage directory if it doesn't exist
         os.makedirs(storage_dir, exist_ok=True)
     
-    def _get_asset_path(self, asset_id: str) -> str:
+    def _get_asset_path(self, asset_id: AssetId) -> str:
         """Get the file path for an asset"""
-        return f"{self.storage_dir}/{asset_id}.json"
+        return f"{self.storage_dir}/{asset_id.value}.json"
     
-    def save(self, asset_request: AssetUploadRequest, asset_id: str) -> str:
+    def save(self, asset_request: AssetUploadRequest, asset_id: AssetId) -> AssetId:
         """Save an asset to disk"""
         import json
         
@@ -103,7 +103,7 @@ class FileSystemAssetStorage(AssetStorage):
         
         # Convert to dictionary for JSON serialization
         asset_data = {
-            "asset_id": asset.asset_id,
+            "asset_id": asset.asset_id.value,
             "description": asset.description,
             "content": asset.content,
             "location": {
@@ -141,7 +141,7 @@ class FileSystemAssetStorage(AssetStorage):
                     with open(asset_path, 'r') as f:
                         asset_data = json.load(f)
                         assets.append(AssetSummary(
-                            asset_id=asset_data['asset_id'],
+                            asset_id=AssetId.from_string(asset_data['asset_id']),
                             description=asset_data['description']
                         ))
                 except (json.JSONDecodeError, KeyError, IOError):
@@ -150,7 +150,7 @@ class FileSystemAssetStorage(AssetStorage):
         
         return assets
     
-    def retrieve(self, asset_id: str) -> Optional[Asset]:
+    def retrieve(self, asset_id: AssetId) -> Optional[Asset]:
         """Retrieve a specific asset from disk"""
         import json
         from datetime import datetime
@@ -163,7 +163,7 @@ class FileSystemAssetStorage(AssetStorage):
                 asset_data = json.load(f)
                 
                 return Asset(
-                    asset_id=asset_data['asset_id'],
+                    asset_id=AssetId.from_string(asset_data['asset_id']),
                     description=asset_data['description'],
                     content=asset_data['content'],
                     location=GPSCoordinates(

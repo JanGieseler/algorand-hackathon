@@ -1,86 +1,81 @@
-import { useWallet, Wallet, WalletId } from '@txnlab/use-wallet-react'
-import Account from './Account'
+import { useWallet, Wallet, WalletId } from "@txnlab/use-wallet-react";
+import Account from "./Account";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ConnectWalletInterface {
-  openModal: boolean
-  closeModal: () => void
+  openModal: boolean;
+  closeModal: () => void;
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { wallets, activeAddress } = useWallet()
+  const { wallets, activeAddress } = useWallet();
 
-  const isKmd = (wallet: Wallet) => wallet.id === WalletId.KMD
+  const isKmd = (wallet: Wallet) => wallet.id === WalletId.KMD;
+  console.log(wallets);
+  console.log(activeAddress);
 
   return (
-    <dialog id="connect_wallet_modal" className={`modal ${openModal ? 'modal-open' : ''}`} style={{ display: openModal ? 'block' : 'none' }}>
-      <form method="dialog" className="modal-box">
-        <h3 className="font-bold text-2xl">Select wallet provider</h3>
+    <Dialog open={openModal} onOpenChange={(isOpen) => !isOpen && closeModal()}>
+      <DialogContent className="bg-slate-200">
+        <DialogHeader>
+          <DialogTitle>Select wallet provider</DialogTitle>
+        </DialogHeader>
 
-        <div className="grid m-2 pt-5">
+        <div className="grid gap-4 py-4">
           {activeAddress && (
             <>
               <Account />
-              <div className="divider" />
+              <hr className="my-2" />
             </>
           )}
 
           {!activeAddress &&
             wallets?.map((wallet) => (
-              <button
+              <Button
                 data-test-id={`${wallet.id}-connect`}
-                className="btn border-teal-800 border-1  m-2"
+                variant="outline"
                 key={`provider-${wallet.id}`}
                 onClick={() => {
-                  return wallet.connect()
+                  return wallet.connect();
                 }}
+                className="flex h-auto items-center justify-start gap-4"
               >
-                {!isKmd(wallet) && (
-                  <img
-                    alt={`wallet_icon_${wallet.id}`}
-                    src={wallet.metadata.icon}
-                    style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
-                  />
-                )}
-                <span>{isKmd(wallet) ? 'LocalNet Wallet' : wallet.metadata.name}</span>
-              </button>
+                {!isKmd(wallet) && <img alt={`wallet_icon_${wallet.id}`} src={wallet.metadata.icon} className="w-8 h-8 object-contain" />}
+                <span className="truncate">{isKmd(wallet) ? "LocalNet Wallet" : wallet.metadata.name}</span>
+              </Button>
             ))}
         </div>
 
-        <div className="modal-action grid">
-          <button
-            data-test-id="close-wallet-modal"
-            className="btn"
-            onClick={() => {
-              closeModal()
-            }}
-          >
+        <DialogFooter>
+          <Button variant="secondary" data-test-id="close-wallet-modal" onClick={closeModal}>
             Close
-          </button>
+          </Button>
           {activeAddress && (
-            <button
-              className="btn btn-warning"
+            <Button
+              variant="destructive"
               data-test-id="logout"
               onClick={async () => {
                 if (wallets) {
-                  const activeWallet = wallets.find((w) => w.isActive)
+                  const activeWallet = wallets.find((w) => w.isActive);
                   if (activeWallet) {
-                    await activeWallet.disconnect()
+                    await activeWallet.disconnect();
                   } else {
                     // Required for logout/cleanup of inactive providers
                     // For instance, when you login to localnet wallet and switch network
                     // to testnet/mainnet or vice verse.
-                    localStorage.removeItem('@txnlab/use-wallet:v3')
-                    window.location.reload()
+                    localStorage.removeItem("@txnlab/use-wallet:v3");
+                    window.location.reload();
                   }
                 }
               }}
             >
               Logout
-            </button>
+            </Button>
           )}
-        </div>
-      </form>
-    </dialog>
-  )
-}
-export default ConnectWallet
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+export default ConnectWallet;

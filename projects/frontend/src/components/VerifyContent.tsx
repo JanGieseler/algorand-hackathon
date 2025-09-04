@@ -1,17 +1,17 @@
 import { useSnackbar } from "notistack";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 
-interface UploadContentInterface {
+interface VerifyContentInterface {
   openModal: boolean;
   setModalState: (value: boolean) => void;
 }
 
-interface UploadFormData {
+interface VerifyFormData {
   content: string;
   publisher: string;
   creator: string;
@@ -21,9 +21,9 @@ interface UploadFormData {
   timestamp: string;
 }
 
-const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => {
+const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [formData, setFormData] = useState<UploadFormData>({
+  const [formData, setFormData] = useState<VerifyFormData>({
     content: "",
     publisher: "",
     creator: "",
@@ -67,7 +67,7 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
     }
   }, [openModal]);
 
-  const handleInputChange = (field: keyof UploadFormData, value: string) => {
+  const handleInputChange = (field: keyof VerifyFormData, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -86,7 +86,7 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
     }
 
     try {
-      enqueueSnackbar("Uploading content...", { variant: "info" });
+      enqueueSnackbar("Verifying content...", { variant: "info" });
       const { latitude, longitude, ...rest } = formData;
       const dataToSubmit = {
         ...rest,
@@ -97,7 +97,7 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
         },
       };
 
-      const response = await fetch("http://localhost:8000/upload", {
+      const response = await fetch("http://localhost:8000/verify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +106,7 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
       });
 
       if (response.ok) {
-        enqueueSnackbar("Content uploaded successfully!", { variant: "success" });
+        enqueueSnackbar("Content verified successfully!", { variant: "success" });
         // Reset form
         setFormData({
           content: "",
@@ -123,7 +123,7 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
       }
     } catch (e) {
       console.error("Upload failed:", e);
-      enqueueSnackbar("Failed to upload content", { variant: "error" });
+      enqueueSnackbar("Failed to verify content", { variant: "error" });
     }
 
     setLoading(false);
@@ -136,8 +136,8 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
       <DialogContent className="sm:max-w-[425px] bg-slate-200">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Upload Content</DialogTitle>
-            <DialogDescription>Fill out the form below to upload your content</DialogDescription>
+            <DialogTitle>Verify Content</DialogTitle>
+            <DialogDescription>Fill out the form below to verify your content</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -196,7 +196,7 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
               </Button>
             </DialogClose>
             <Button type="submit" disabled={loading || !isFormValid}>
-              {loading ? "Uploading..." : "Submit"}
+              {loading ? "Verifying..." : "Submit"}
             </Button>
           </DialogFooter>
         </form>
@@ -205,4 +205,4 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
   );
 };
 
-export default UploadContent;
+export default VerifyContent;

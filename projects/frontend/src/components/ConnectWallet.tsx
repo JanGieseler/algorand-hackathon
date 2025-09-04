@@ -12,8 +12,6 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
   const { wallets, activeAddress } = useWallet();
 
   const isKmd = (wallet: Wallet) => wallet.id === WalletId.KMD;
-  console.log(wallets);
-  console.log(activeAddress);
 
   return (
     <Dialog open={openModal} onOpenChange={(isOpen) => !isOpen && closeModal()}>

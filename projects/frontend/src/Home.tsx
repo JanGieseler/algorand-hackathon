@@ -6,15 +6,16 @@ import ConnectWallet from "./components/ConnectWallet";
 import Transact from "./components/Transact";
 import UploadContent from "./components/UploadContent";
 import VerifyContent from "./components/VerifyContent";
+import PreviewContent from "./components/PreviewContent";
 
-interface AssetSummary {
+interface Asset {
   asset_id: string;
   description: string;
 }
 
 interface AssetsListResponse {
   success: boolean;
-  assets: AssetSummary[];
+  assets: Asset[];
   message: string;
 }
 
@@ -25,7 +26,9 @@ const Home: React.FC<HomeProps> = () => {
   const [openDemoModal, setOpenDemoModal] = useState<boolean>(false);
   const [openUploadModal, setOpenUploadModal] = useState<boolean>(false);
   const [openVerifyModal, setOpenVerifyModal] = useState<boolean>(false);
-  const [assets, setAssets] = useState<AssetSummary[]>([]);
+  const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,13 +51,16 @@ const Home: React.FC<HomeProps> = () => {
     setOpenVerifyModal(!openVerifyModal);
   };
 
+  const togglePreviewModal = () => {
+    setOpenPreviewModal(!openPreviewModal);
+  };
+
   // Fetch assets from backend
   const fetchAssets = async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await fetch("http://localhost:8000/assets");
-      console.log(response);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -186,8 +192,14 @@ const Home: React.FC<HomeProps> = () => {
                   </div>
                 </div>
 
-                <button className="w-full bg-teal-50 hover:bg-teal-100 text-teal-700 py-2 px-4 rounded-lg font-medium transition-all duration-200 border border-teal-200">
-                  View Details
+                <button
+                  className="w-full bg-teal-50 hover:bg-teal-100 text-teal-700 py-2 px-4 rounded-lg font-medium transition-all duration-200 border border-teal-200"
+                  onClick={() => {
+                    setSelectedAsset(asset);
+                    togglePreviewModal();
+                  }}
+                >
+                  🔍 View Details
                 </button>
               </div>
             ))}
@@ -222,6 +234,7 @@ const Home: React.FC<HomeProps> = () => {
       <Transact openModal={openDemoModal} setModalState={setOpenDemoModal} />
       <UploadContent openModal={openUploadModal} setModalState={setOpenUploadModal} />
       <VerifyContent openModal={openVerifyModal} setModalState={setOpenVerifyModal} />
+      {selectedAsset && <PreviewContent openModal={openPreviewModal} setModalState={setOpenPreviewModal} asset={selectedAsset} />}
     </div>
   );
 };

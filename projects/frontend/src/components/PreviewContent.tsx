@@ -2,12 +2,16 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useEffect, useState } from "react";
 
 interface AssetIdResponse {
-  asset_id: string;
+  asset_id: {
+    value: string;
+  };
   description: string;
 }
 
 interface Asset {
-  asset_id: string;
+  asset_id: {
+    value: string;
+  };
   description: string;
   content: string;
   location: {
@@ -29,7 +33,7 @@ const PreviewContent: React.FC<PreviewContentProps> = ({ asset, openModal, setMo
   const [assetData, setAssetData] = useState<Asset | null>(null);
   useEffect(() => {
     const fetchAsset = async () => {
-      const response = await fetch(`http://localhost:8000/assets/${asset.asset_id}`);
+      const response = await fetch(`http://localhost:8000/assets/${asset.asset_id.value}`);
       const data = await response.json();
       console.log(data);
       setAssetData(data.asset);
@@ -42,12 +46,12 @@ const PreviewContent: React.FC<PreviewContentProps> = ({ asset, openModal, setMo
       <DialogContent className="sm:max-w-3xl bg-slate-200">
         <DialogHeader>
           <DialogTitle>Asset Preview</DialogTitle>
-          <DialogDescription>Details for asset {assetData?.asset_id}</DialogDescription>
+          <DialogDescription>Details for asset {assetData?.asset_id.value}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <span className="text-right font-bold">Asset ID</span>
-            <span className="col-span-3 break-all">{assetData?.asset_id}</span>
+            <span className="col-span-3 break-all">{assetData?.asset_id.value}</span>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <span className="text-right font-bold">Description</span>

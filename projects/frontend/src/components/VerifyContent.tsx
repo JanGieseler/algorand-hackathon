@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import JsonDropzone from "./JsonDropzone";
 
 interface VerifyContentInterface {
   openModal: boolean;
@@ -35,8 +36,33 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const handleJsonParsed = (data: any) => {
+    setFormData({
+      content: data.content || "",
+      publisher: data.publisher || "",
+      creator: data.creator || "",
+      description: data.description || "",
+      latitude: data.location?.latitude || 0,
+      longitude: data.location?.longitude || 0,
+      timestamp: data.timestamp || "",
+    });
+    enqueueSnackbar("JSON data parsed and form populated!", { variant: "success" });
+  };
+
   useEffect(() => {
-    if (openModal) {
+    if (!openModal) {
+      // Reset form data when modal is closed
+      setFormData({
+        content: "",
+        publisher: "",
+        creator: "",
+        description: "",
+        latitude: 0,
+        longitude: 0,
+        timestamp: "",
+      });
+    } else {
+      // Fetch location when modal is opened
       const berlinCoordinates = {
         latitude: 52.52,
         longitude: 13.405,
@@ -139,6 +165,9 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
             <DialogTitle>Verify Content</DialogTitle>
             <DialogDescription>Fill out the form below to verify your content</DialogDescription>
           </DialogHeader>
+          <div className="py-4">
+            <JsonDropzone onJsonParsed={handleJsonParsed} />
+          </div>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="content-1">Content</Label>

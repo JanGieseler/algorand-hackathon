@@ -9,7 +9,9 @@ import VerifyContent from "./components/VerifyContent";
 import PreviewContent from "./components/PreviewContent";
 
 interface Asset {
-  asset_id: string;
+  asset_id: {
+    value: string;
+  };
   description: string;
 }
 
@@ -58,6 +60,7 @@ const Home: React.FC<HomeProps> = () => {
     setOpenPreviewModal(!openPreviewModal);
   };
 
+  console.log("assets", assets);
   // Fetch assets from backend
   const fetchAssets = async () => {
     try {
@@ -208,14 +211,14 @@ const Home: React.FC<HomeProps> = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {assets.map((asset) => (
               <div
-                key={asset.asset_id}
+                key={asset.asset_id.value}
                 className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-teal-200"
               >
                 <div className="flex items-start gap-3 mb-4">
                   <div className="text-2xl">📄</div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800 text-lg mb-2 line-clamp-2">{asset.description}</h3>
-                    <p className="text-sm text-gray-500 font-mono">ID: {asset.asset_id.substring(0, 8)}...</p>
+                    <p className="text-sm text-gray-500 font-mono">ID: {asset.asset_id.value.substring(0, 8)}...</p>
                   </div>
                 </div>
 
@@ -271,14 +274,14 @@ const Home: React.FC<HomeProps> = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {verifiedAssets.map((asset) => (
               <div
-                key={asset.asset_id}
+                key={asset.asset_id.value}
                 className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-teal-200"
               >
                 <div className="flex items-start gap-3 mb-4">
                   <div className="text-2xl">📄</div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800 text-lg mb-2 line-clamp-2">{asset.description}</h3>
-                    <p className="text-sm text-gray-500 font-mono">ID: {asset.asset_id.substring(0, 8)}...</p>
+                    <p className="text-sm text-gray-500 font-mono">ID: {asset.asset_id.value.substring(0, 8)}...</p>
                   </div>
                 </div>
 

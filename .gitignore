@@ -169,3 +169,4 @@ cython_debug/
 # NPM
 node_modules
 
+.env

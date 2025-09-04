@@ -56,6 +56,7 @@ class AssetUploadRequest(BaseModel):
 class AssetUploadResponse(BaseModel):
     success: bool
     asset_id: Optional[AssetId] = None
+    transaction_id: Optional[str] = None
     message: str
 
 class AssetSummary(BaseModel):
@@ -67,6 +68,8 @@ class AssetsListResponse(BaseModel):
     assets: List[AssetSummary]
     message: str
 
+
+
 class Asset(BaseModel):
     asset_id: AssetId
     description: str
@@ -76,7 +79,15 @@ class Asset(BaseModel):
     creator: str
     publisher: str
 
+class AssetWithTransaction(Asset):
+    transaction_id: str
+
 class AssetResponse(BaseModel):
     success: bool
     asset: Optional[Asset] = None
     message: str
+
+class BalanceResponse(BaseModel):
+    success: bool
+    balance_microalgos: int
+    address: str

@@ -1,6 +1,6 @@
 import hashlib
 import json
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from .models import AssetUploadRequest, Asset, AssetSummary, AssetId
 from .storage import storage
 
@@ -18,10 +18,11 @@ def generate_asset_id(asset: AssetUploadRequest) -> AssetId:
     hash_value = hashlib.sha256(hash_string.encode()).hexdigest()
     return AssetId.from_string(hash_value)
 
-def save_asset(asset_request: AssetUploadRequest) -> AssetId:
+def save_asset(asset_request: AssetUploadRequest) -> Tuple[AssetId, str]:
     """Save an asset and return its generated ID"""
     asset_id = generate_asset_id(asset_request)
-    return storage.save(asset_request, asset_id)
+    transaction_id = storage.save_and_link(asset_request, asset_id)
+    return asset_id, transaction_id
 
 def get_asset_by_id(asset_id: AssetId) -> Optional[Asset]:
     """Retrieve an asset by its ID"""

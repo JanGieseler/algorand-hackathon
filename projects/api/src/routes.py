@@ -1,4 +1,7 @@
+import os
 from fastapi import APIRouter
+
+from .get_balance import get_account_balance
 
 from .models import (
     HealthResponse, 
@@ -6,9 +9,12 @@ from .models import (
     AssetUploadResponse, 
     AssetsListResponse, 
     AssetResponse,
-    AssetId
+    AssetId,
+    BalanceResponse
 )
+
 from .utils import save_asset, get_asset_by_id, get_all_assets
+
 
 router = APIRouter()
 
@@ -28,11 +34,12 @@ async def health_check():
 
 @router.post("/upload", response_model=AssetUploadResponse)
 async def upload_asset(asset: AssetUploadRequest):
-    asset_id = save_asset(asset)
+    asset_id, transaction_id = save_asset(asset)
     return AssetUploadResponse(
         success=True,
         asset_id=asset_id,
-        message="Asset uploaded successfully"
+        message="Asset uploaded successfully",
+        transaction_id=transaction_id
     )
 
 @router.get("/assets", response_model=AssetsListResponse)
@@ -67,3 +74,13 @@ async def get_asset(asset_id: str):
         asset=asset,
         message="Asset retrieved successfully"
     )
+
+@router.get("/balance", response_model=BalanceResponse)
+async def get_balance():
+    """Get the balance of the configured ALGO account"""
+    from dotenv import load_dotenv
+    load_dotenv()
+    account_address = os.getenv('ALGO_ACCOUNT')
+    balance = get_account_balance(account_address)
+    return BalanceResponse(
+        success=True, balance_microalgos=balance, address=account_address)

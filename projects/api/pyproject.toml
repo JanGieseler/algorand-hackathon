@@ -11,6 +11,8 @@ python = "^3.10"
 fastapi = "^0.116.1"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
 pydantic = "^2.0.0"
+py-algorand-sdk = "^2.6.0"
+python-dotenv = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"

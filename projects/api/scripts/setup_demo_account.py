@@ -7,16 +7,14 @@ including account creation, funding, and other development utilities.
 
 from pathlib import Path
 from algosdk import account, transaction, mnemonic
-from algosdk.v2client import algod
 import os
 from typing import Tuple
 
 from dotenv import load_dotenv
 
+from ..src.dev_tools import get_localnet_client
 
-def get_localnet_client() -> algod.AlgodClient:
-    """Get Algorand LocalNet client"""
-    return algod.AlgodClient("a" * 64, "http://localhost:4001")
+
 
 
 def create_demo_account(output_dir: str = "data/keys") -> str:
@@ -139,19 +137,6 @@ def fund_account(target_address: str, amount_algos: float = 1.0) -> str:
     return txid
 
 
-def get_account_balance(address: str) -> int:
-    """
-    Get the balance of an account in microALGOs.
-    
-    Args:
-        address: Address of the account
-        
-    Returns:
-        Balance in microALGOs
-    """
-    algod_client = get_localnet_client()
-    account_info = algod_client.account_info(address)
-    return account_info["amount"]
 
 
 def ensure_account_funded(address: str, min_balance_algos: float = 0.1) -> bool:

@@ -1,0 +1,13 @@
+{
+  "asset_id": "c9f80c23cebd0adc7debd3bb59416d753699f3ace236e7bf20334ad74170e834",
+  "description": "This is our first asset",
+  "content": "Once upon a time there was a little ....",
+  "location": {
+    "latitude": 52.52,
+    "longitude": 13.405
+  },
+  "timestamp": "2025-09-04T12:53:48.948000Z",
+  "creator": "Luke",
+  "publisher": "dPress",
+  "transaction_id": "C2DTXSMHOPDTCT7QA65JF6OABLHBFBMVXOXETAJWI3BQLYGRMKL2ULTDLA"
+}

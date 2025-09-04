@@ -117,15 +117,15 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
 
     try {
       enqueueSnackbar("Verifying content...", { variant: "info" });
-      const { latitude, longitude, ...rest } = formData;
+      const { latitude, longitude, description, ...rest } = formData;
       const dataToSubmit = {
         ...rest,
-        timestamp: new Date(Date.now()).toISOString(),
         location: {
           latitude: formData.latitude,
           longitude: formData.longitude,
         },
       };
+      console.log(dataToSubmit, "dataToSubmit");
 
       const response = await fetch("http://localhost:8000/verify", {
         method: "POST",
@@ -135,7 +135,9 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
         body: JSON.stringify(dataToSubmit),
       });
 
-      if (response.ok) {
+      const responseData = await response.json();
+      console.log(responseData, "responseData");
+      if (responseData.is_verified) {
         enqueueSnackbar("Content verified successfully!", { variant: "success" });
         // Reset form
         setFormData({
@@ -153,7 +155,7 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (e) {
-      console.error("Upload failed:", e);
+      console.error("Verify failed:", e);
       enqueueSnackbar("Failed to verify content", { variant: "error" });
     }
 
@@ -230,11 +232,50 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
                 name="transaction_id"
                 placeholder="Transaction ID"
                 required
-                value={formData.transaction_id}
-                onChange={(e) => handleInputChange("transaction_id", e.target.value)}
+                value={formData.transaction_id.trim()}
+                onChange={(e) => handleInputChange("transaction_id", e.target.value.trim())}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="is-verified-1">Time</Label>
+              <Input
+                id="time-1"
+                name="time"
+                placeholder="Time"
+                required
+                value={formData.timestamp}
+                onChange={(e) => handleInputChange("timestamp", e.target.value)}
               />
             </div>
           </div>
+
+          {/* <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="is-verified-1">Latitude</Label>
+              <Input
+                id="latitude-1"
+                name="latitude"
+                placeholder="Latitude"
+                required
+                value={formData.latitude}
+                onChange={(e) => handleInputChange("latitude", e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="is-verified-1">Longitude</Label>
+              <Input
+                id="longitude-1"
+                name="longitude"
+                placeholder="Longitude"
+                required
+                value={formData.longitude}
+                onChange={(e) => handleInputChange("longitude", e.target.value)}
+              />
+            </div>
+          </div> */}
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline" type="button">

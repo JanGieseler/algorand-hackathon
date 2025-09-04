@@ -68,7 +68,7 @@ const PreviewContent: React.FC<PreviewContentProps> = ({ asset, openModal, setMo
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <span className="text-right font-bold">Timestamp</span>
-            <span className="col-span-3">{new Date(assetData?.timestamp || "").toLocaleString()}</span>
+            <span className="col-span-3">{assetData?.timestamp || ""}</span>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <span className="text-right font-bold">Creator</span>

@@ -112,7 +112,6 @@ const Home: React.FC<HomeProps> = () => {
   // Fetch assets on component mount
   useEffect(() => {
     fetchAssets();
-    fetchVerifiedAssets();
   }, []);
 
   // Refresh assets when upload modal closes (in case new asset was added)

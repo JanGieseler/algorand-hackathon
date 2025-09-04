@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import base64
 from algosdk.v2client import algod
 from typing import Dict, List, Optional
 import hashlib
@@ -391,8 +392,10 @@ class HybridAssetStorage:
         metadata_json = json.dumps(note_data, separators=(',', ':'))
         metadata_hash = hashlib.sha256(metadata_json.encode('utf-8')).digest()
 
-        print(':::', metadata_hash, hash_block_chain)
-        return metadata_hash == hash_block_chain
+        # Convert the computed hash to base64 to match blockchain format
+        metadata_hash_base64 = base64.b64encode(metadata_hash).decode('utf-8')
+
+        return metadata_hash_base64 == hash_block_chain
 
 # Global storage instance (in production, this would be configured via dependency injection)
 # storage: AssetStorage = InMemoryAssetStorage()

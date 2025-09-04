@@ -53,6 +53,14 @@ class AssetUploadRequest(BaseModel):
     creator: str
     publisher: str
 
+class AssetVerifyRequest(BaseModel):
+    content: str
+    location: GPSCoordinates
+    timestamp: datetime
+    creator: str
+    publisher: str
+    transaction_id: str
+
 class AssetUploadResponse(BaseModel):
     success: bool
     asset_id: Optional[AssetId] = None

@@ -3,10 +3,12 @@ from algosdk.v2client import algod
 from typing import Dict, List, Optional
 import hashlib
 
+from .asset_retrieve import get_hash_from_transaction
+from .generate_asset_id import generate_asset_id
+
 from .asset_create import create_asset
-from .models import Asset, AssetUploadRequest, AssetSummary, AssetId
+from .models import Asset, AssetUploadRequest, AssetSummary, AssetId, AssetVerifyRequest
             
-from algosdk import transaction
 import json
 import os
 from dotenv import load_dotenv
@@ -39,7 +41,7 @@ class AssetStorage(ABC):
         pass
     
     @abstractmethod
-    def retrieve(self, transaction_id: str) -> Optional[Asset]:
+    def retrieve(self, asset_id: AssetId) -> Optional[Asset]:
         """
         Retrieve a specific asset by its ID
         
@@ -278,9 +280,9 @@ class AlgorandStorage:
 
         # Create metadata to store in note field (max 1KB)
         note_data = {
-            "type": "asset_registry",
-            "asset_id": asset_id.value,
-            "description": asset_request.description[:100],  # Truncate if too long
+            "latitude": asset_request.location.latitude,
+            "longitude": asset_request.location.longitude,
+            "content": asset_request.content,
             "creator": asset_request.creator,
             "publisher": asset_request.publisher,
             "timestamp": asset_request.timestamp.isoformat()
@@ -323,12 +325,11 @@ class AlgorandStorage:
         print("⚠️ Asset listing not supported for pure blockchain storage")
         return []
     
-    def retrieve(self, asset_id: AssetId) -> Optional[Asset]:
-        """Retrieve a specific asset - not supported for pure blockchain storage"""
-        # Pure blockchain storage doesn't support efficient retrieval
-        # In a real implementation, you'd need to scan transactions for the asset_id
-        print("⚠️ Asset retrieval not supported for pure blockchain storage")
-        return None
+    def retrieve_hash(self, transaction_id: str) -> str:
+        """Retrieve a specific asset from blockchain storage"""
+        asset_hash =get_hash_from_transaction(self.algod_client, transaction_id=transaction_id)
+
+        return asset_hash
 
 
 class HybridAssetStorage:
@@ -368,6 +369,30 @@ class HybridAssetStorage:
     def retrieve(self, asset_id: AssetId) -> Optional[Asset]:
         """Retrieve asset from local storage"""
         return self.local_storage.retrieve(asset_id)
+    
+    def verify_asset(self, asset:AssetVerifyRequest, transaction_id:str)->AssetId:
+        
+        hash_block_chain = self.blockchain_storage.retrieve_hash(transaction_id)
+
+
+        asset_request =AssetUploadRequest(
+            description="NOT RELEVANT = CHANGE INPUT TO generate_asset_id",
+            content=asset.content,location=asset.location, timestamp=asset.timestamp, creator=asset.creator, publisher=asset.publisher)
+
+        note_data = {
+            "latitude": asset_request.location.latitude,
+            "longitude": asset_request.location.longitude,
+            "content": asset_request.content,
+            "creator": asset_request.creator,
+            "publisher": asset_request.publisher,
+            "timestamp": asset_request.timestamp.isoformat()
+        }
+        
+        metadata_json = json.dumps(note_data, separators=(',', ':'))
+        metadata_hash = hashlib.sha256(metadata_json.encode('utf-8')).digest()
+
+        print(':::', metadata_hash, hash_block_chain)
+        return metadata_hash == hash_block_chain
 
 # Global storage instance (in production, this would be configured via dependency injection)
 # storage: AssetStorage = InMemoryAssetStorage()

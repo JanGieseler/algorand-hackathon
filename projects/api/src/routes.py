@@ -10,8 +10,15 @@ from .models import (
     AssetsListResponse, 
     AssetResponse,
     AssetId,
-    BalanceResponse
+    BalanceResponse,
+    AssetVerifyRequest
 )
+from pydantic import BaseModel
+
+class AssetVerifyResponse(BaseModel):
+    success: bool
+    is_verified: bool
+    message: str
 
 from .utils import save_asset, get_asset_by_id, get_all_assets
 
@@ -84,3 +91,19 @@ async def get_balance():
     balance = get_account_balance(account_address)
     return BalanceResponse(
         success=True, balance_microalgos=balance, address=account_address)
+
+@router.post("/verify", response_model=AssetVerifyResponse)
+async def verify_asset(asset_verify: AssetVerifyRequest):
+    """Verify an asset against the blockchain"""
+    from .storage import storage
+    
+
+    # Call the verify_asset method from HybridAssetStorage
+    is_verified = storage.verify_asset(asset_verify, asset_verify.transaction_id)
+    
+    return AssetVerifyResponse(
+        success=True,
+        is_verified=is_verified,
+        message="Asset verification completed successfully" if is_verified else "Asset verification failed"
+    )
+        

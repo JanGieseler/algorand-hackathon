@@ -20,6 +20,7 @@ interface VerifyFormData {
   latitude: number;
   longitude: number;
   timestamp: string;
+  transaction_id: string;
 }
 
 const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => {
@@ -32,6 +33,7 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
     latitude: 0,
     longitude: 0,
     timestamp: "",
+    transaction_id: "",
   });
 
   const { enqueueSnackbar } = useSnackbar();
@@ -45,6 +47,7 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
       latitude: data.location?.latitude || 0,
       longitude: data.location?.longitude || 0,
       timestamp: data.timestamp || "",
+      transaction_id: data.transaction_id || "",
     });
     enqueueSnackbar("JSON data parsed and form populated!", { variant: "success" });
   };
@@ -60,6 +63,7 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
         latitude: 0,
         longitude: 0,
         timestamp: "",
+        transaction_id: "",
       });
     } else {
       // Fetch location when modal is opened
@@ -142,6 +146,7 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
           latitude: 0,
           longitude: 0,
           timestamp: "",
+          transaction_id: "",
         });
         setModalState(false);
       } else {
@@ -215,6 +220,18 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
                 required
                 value={formData.creator}
                 onChange={(e) => handleInputChange("creator", e.target.value)}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="transaction-id-1">Transaction ID</Label>
+              <Input
+                id="transaction-id-1"
+                name="transaction_id"
+                placeholder="Transaction ID"
+                required
+                value={formData.transaction_id}
+                onChange={(e) => handleInputChange("transaction_id", e.target.value)}
               />
             </div>
           </div>

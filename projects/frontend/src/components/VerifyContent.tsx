@@ -16,7 +16,7 @@ interface VerifyFormData {
   content: string;
   publisher: string;
   creator: string;
-  description: string;
+  description?: string;
   latitude: number;
   longitude: number;
   timestamp: string;
@@ -109,7 +109,7 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
     setLoading(true);
 
     // Validate required fields
-    if (!formData.content.trim() || !formData.publisher.trim() || !formData.creator.trim() || !formData.description.trim()) {
+    if (!formData.content.trim() || !formData.publisher.trim() || !formData.creator.trim() || !formData?.description?.trim()) {
       enqueueSnackbar("Please fill in all fields", { variant: "warning" });
       setLoading(false);
       return;
@@ -160,7 +160,7 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
     setLoading(false);
   };
 
-  const isFormValid = formData.content.trim() && formData.publisher.trim() && formData.creator.trim() && formData.description.trim();
+  const isFormValid = formData.content.trim() && formData.publisher.trim() && formData.creator.trim() && formData?.description?.trim();
 
   return (
     <Dialog open={openModal} onOpenChange={setModalState}>

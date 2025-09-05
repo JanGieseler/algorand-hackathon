@@ -10,6 +10,7 @@ import JsonDropzone from "./JsonDropzone";
 interface UploadContentInterface {
   openModal: boolean;
   setModalState: (value: boolean) => void;
+  setTransactionId: (value: string) => void;
 }
 
 interface UploadFormData {
@@ -22,7 +23,7 @@ interface UploadFormData {
   timestamp: string;
 }
 
-const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => {
+const UploadContent = ({ openModal, setModalState, setTransactionId }: UploadContentInterface) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<UploadFormData>({
     content: "",
@@ -130,6 +131,10 @@ const UploadContent = ({ openModal, setModalState }: UploadContentInterface) => 
         },
         body: JSON.stringify(dataToSubmit),
       });
+
+      const responseData = await response.json();
+      setTransactionId(responseData.transaction_id);
+      console.log(responseData.transaction_id, "responseData.transaction_id");
 
       if (response.ok) {
         enqueueSnackbar("Content uploaded successfully!", { variant: "success" });

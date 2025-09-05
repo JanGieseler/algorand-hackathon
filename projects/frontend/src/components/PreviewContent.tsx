@@ -35,7 +35,6 @@ const PreviewContent: React.FC<PreviewContentProps> = ({ asset, openModal, setMo
     const fetchAsset = async () => {
       const response = await fetch(`http://localhost:8000/assets/${asset.asset_id.value}`);
       const data = await response.json();
-      console.log(data);
       setAssetData(data.asset);
     };
     fetchAsset();

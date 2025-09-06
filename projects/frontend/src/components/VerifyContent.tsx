@@ -125,7 +125,6 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
           longitude: formData.longitude,
         },
       };
-      console.log(dataToSubmit, "dataToSubmit");
 
       const response = await fetch("http://localhost:8000/verify", {
         method: "POST",
@@ -136,7 +135,6 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
       });
 
       const responseData = await response.json();
-      console.log(responseData, "responseData");
       if (responseData.is_verified) {
         enqueueSnackbar("Content verified successfully!", { variant: "success" });
         // Reset form
@@ -189,16 +187,29 @@ const VerifyContent = ({ openModal, setModalState }: VerifyContentInterface) => 
               />
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="description-1">Description</Label>
-              <Input
-                id="description-1"
-                name="description"
-                placeholder="Brief description"
-                required
-                value={formData.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
-              />
+            <div className="flex gap-2">
+              <div className="grid gap-2">
+                <Label htmlFor="description-1">Latitude</Label>
+                <Input
+                  id="latitude-1"
+                  name="latitude"
+                  placeholder="Latitude"
+                  required
+                  value={formData.latitude}
+                  onChange={(e) => handleInputChange("latitude", e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="description-1">Longitude</Label>
+                <Input
+                  id="longitude-1"
+                  name="longitude"
+                  placeholder="Longitude"
+                  required
+                  value={formData.longitude}
+                  onChange={(e) => handleInputChange("longitude", e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="grid gap-2">

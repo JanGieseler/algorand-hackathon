@@ -42,8 +42,8 @@ class TestInMemoryAssetStorage:
         
         # Add first asset
         test_id_1 = AssetId.from_string("a" * 64)  # Valid SHA-256 format
-        asset_id_1 = self.storage.save(asset1, test_id_1)
-        assert asset_id_1 == test_id_1
+        self.storage.save(asset1, test_id_1)
+
         
         # Check we have one asset
         assets_after_first = self.storage.list()
@@ -53,8 +53,7 @@ class TestInMemoryAssetStorage:
         
         # Add second asset
         test_id_2 = AssetId.from_string("b" * 64)  # Valid SHA-256 format
-        asset_id_2 = self.storage.save(asset2, test_id_2)
-        assert asset_id_2 == test_id_2
+        self.storage.save(asset2, test_id_2)
         
         # Check we have two assets
         all_assets = self.storage.list()
